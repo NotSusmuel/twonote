@@ -4,7 +4,7 @@ import { TextContainer } from '../components/TextContainer';
 
 // Mock useEditor since we don't want to test TipTap internals here
 vi.mock('@tiptap/react', async (importOriginal) => {
-  const actual = await importOriginal() as any;
+  const actual = await importOriginal() as Record<string, unknown>;
   return {
     ...actual,
     useEditor: vi.fn(() => ({
