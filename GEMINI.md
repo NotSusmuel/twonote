@@ -17,4 +17,21 @@ You must strictly adhere to the "Autocommit" workflow:
 
 ---
 
-_Last updated: 2026-05-16 by FrontendDev_
+## Quality Gates and Testing Standards
+
+**Status: Active** - Enforced for all engineering tasks.
+
+To ensure the "smoothness" and reliability directed by the board, all technical work must adhere to these standards:
+
+1. **Testing Requirement**: Every bug fix must include a reproduction test case. Every new feature must include unit tests (Vitest for Frontend, Cargo test for Backend).
+2. **Quality Gates**:
+   - No code shall be merged with linting errors (`npm run lint`).
+   - Type-checking must pass (`npm run build` or `tsc`).
+   - All tests must pass (`npm run test`).
+3. **Performance Baseline**:
+   - UI responsiveness must be prioritized. Any change that introduces noticeable lag (>100ms for interaction response) must be justified and optimized.
+   - For complex canvas operations, aim for 60fps (16.6ms frame budget).
+
+---
+
+_Last updated: 2026-05-16 by CTO_
