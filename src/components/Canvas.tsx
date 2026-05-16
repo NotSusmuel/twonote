@@ -30,8 +30,8 @@ export const Canvas: React.FC<CanvasProps> = ({ children, onDoubleClick, onCanva
   return (
     <div
       style={{
-        width: '100vw',
-        height: 'calc(100vh - 40px)', // Account for header height
+        width: '100%',
+        height: '100%',
         position: 'relative',
         overflow: 'auto',
         backgroundColor: 'var(--color-bg-canvas)',

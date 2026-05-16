@@ -7,18 +7,22 @@ describe('App Canvas', () => {
     window.localStorage.clear();
   });
 
-  test('renders initial containers', () => {
+  test('renders OneNote-style notebook, section, and page navigation', () => {
     render(<App />);
+    expect(screen.getByRole('button', { name: 'My Notebook' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'General' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Welcome' })).toBeInTheDocument();
     expect(screen.getAllByText(/Click to edit.../i).length).toBeGreaterThanOrEqual(2);
   });
 
-  test('renders saved note content from local storage', () => {
+  test('imports legacy flat note storage into notebook structure', () => {
     window.localStorage.setItem(
-      'onenote-evolution-prototype-data',
+      'onenote-evolution-notebooks-data',
       JSON.stringify([{ id: 'saved-note', x: 80, y: 120, content: '<p>Saved note</p>' }]),
     );
 
     render(<App />);
+    expect(screen.getByRole('button', { name: 'Imported Notebook' })).toBeInTheDocument();
     expect(screen.getByText('Saved note')).toBeInTheDocument();
   });
 
@@ -33,14 +37,14 @@ describe('App Canvas', () => {
     expect(screen.getAllByText(/Click to edit.../i).length).toBe(initialContainers + 1);
   });
 
-  test('adds a new container from the header button', () => {
+  test('adds a page from the header button', () => {
     render(<App />);
-    fireEvent.click(screen.getByRole('button', { name: 'Add note' }));
-    expect(screen.getByText('3 notes on this canvas')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Add page' }));
+    expect(screen.getByRole('button', { name: 'Page 2' })).toBeInTheDocument();
   });
 
   test('falls back to defaults when local storage is invalid', () => {
-    window.localStorage.setItem('onenote-evolution-prototype-data', 'not-json');
+    window.localStorage.setItem('onenote-evolution-notebooks-data', 'not-json');
     render(<App />);
     expect(screen.getAllByText(/Click to edit.../i)).toHaveLength(2);
   });
@@ -50,9 +54,9 @@ describe('App Canvas', () => {
     const deleteButtons = screen.getAllByRole('button', { name: 'Delete container' });
     deleteButtons.forEach((button) => fireEvent.click(button));
 
-    expect(screen.getByText('Canvas is empty')).toBeInTheDocument();
+    expect(screen.getByText('Page is empty')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Create your first note' }));
-    expect(screen.getByText('1 note on this canvas')).toBeInTheDocument();
+    expect(screen.getAllByLabelText(/note title/i)).toHaveLength(1);
   });
 
   test('renders toolbar with task list button when focused', async () => {
@@ -92,9 +96,17 @@ describe('App Canvas', () => {
 
     fireEvent.change(titles[0], { target: { value: 'Meeting Notes' } });
     fireEvent.change(titles[1], { target: { value: 'Shopping' } });
-    fireEvent.change(screen.getByRole('textbox', { name: /search notes/i }), { target: { value: 'meeting' } });
+    fireEvent.change(screen.getByRole('textbox', { name: /search current page/i }), {
+      target: { value: 'meeting' },
+    });
 
     expect(screen.getAllByLabelText(/note title/i)).toHaveLength(1);
     expect(screen.getByDisplayValue('Meeting Notes')).toBeDefined();
+  });
+
+  test('supports sync action in web preview mode', async () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: /sync onenote/i }));
+    expect(await screen.findByText('Sync ready (web preview)')).toBeInTheDocument();
   });
 });
