@@ -8,25 +8,43 @@ interface ContainerData {
   id: string;
   x: number;
   y: number;
+  title: string;
+  content: string;
 }
 
 const STORAGE_KEY = 'onenote-evolution-prototype-data';
 const INITIAL_CONTAINERS: ContainerData[] = [
-  { id: '1', x: 100, y: 100 },
-  { id: '2', x: 400, y: 150 },
+  { id: '1', x: 100, y: 100, title: 'Quick Notes', content: '<p>Click to edit...</p>' },
+  { id: '2', x: 400, y: 150, title: 'Tasks', content: '<p>Click to edit...</p>' },
 ];
+
+const normalizeContainer = (container: Partial<ContainerData>, fallbackId: string): ContainerData => ({
+  id: container.id ?? fallbackId,
+  x: typeof container.x === 'number' ? container.x : 100,
+  y: typeof container.y === 'number' ? container.y : 100,
+  title: typeof container.title === 'string' ? container.title : 'Untitled note',
+  content: typeof container.content === 'string' ? container.content : '<p>Click to edit...</p>',
+});
 
 function App() {
   const [containers, setContainers] = useState<ContainerData[]>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
-      return saved ? (JSON.parse(saved) as ContainerData[]) : INITIAL_CONTAINERS;
+      if (!saved) {
+        return INITIAL_CONTAINERS;
+      }
+      const parsed = JSON.parse(saved) as Partial<ContainerData>[];
+      if (!Array.isArray(parsed)) {
+        return INITIAL_CONTAINERS;
+      }
+      return parsed.map((container, index) => normalizeContainer(container, `restored-${index}`));
     } catch {
       return INITIAL_CONTAINERS;
     }
   });
   const [selectedContainerId, setSelectedContainerId] = useState<string | null>(null);
   const [deletedStack, setDeletedStack] = useState<ContainerData[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(containers));
@@ -36,15 +54,52 @@ function App() {
     setContainers((prev) => prev.map((c) => (c.id === id ? { ...c, x, y } : c)));
   };
 
-  const handleCreateContainer = useCallback((x: number, y: number) => {
-    const newContainer: ContainerData = {
-      id: Date.now().toString(),
-      x,
-      y,
-    };
-    setContainers((prev) => [...prev, newContainer]);
-    setSelectedContainerId(newContainer.id);
-  }, []);
+  const handleCreateContainer = useCallback(
+    (x: number, y: number, template?: Pick<ContainerData, 'title' | 'content'>) => {
+      const timestamp = Date.now();
+      const defaultTitle = `Untitled note ${containers.length + 1}`;
+      const newContainer: ContainerData = {
+        id: timestamp.toString(),
+        x,
+        y,
+        title: template?.title || defaultTitle,
+        content: template?.content || '<p>Click to edit...</p>',
+      };
+      setContainers((prev) => [...prev, newContainer]);
+      setSelectedContainerId(newContainer.id);
+    },
+    [containers.length]
+  );
+
+  const handleDuplicateSelected = useCallback(() => {
+    if (!selectedContainerId) {
+      return;
+    }
+    const selected = containers.find((c) => c.id === selectedContainerId);
+    if (!selected) {
+      return;
+    }
+    handleCreateContainer(selected.x + 40, selected.y + 40, {
+      title: `${selected.title} (Copy)`,
+      content: selected.content,
+    });
+  }, [containers, handleCreateContainer, selectedContainerId]);
+
+  const handleUpdateContainer = useCallback(
+    (id: string, updates: Partial<Pick<ContainerData, 'title' | 'content'>>) => {
+      setContainers((prev) => prev.map((container) => (container.id === id ? { ...container, ...updates } : container)));
+    },
+    []
+  );
+
+  const filteredContainers = containers.filter((container) => {
+    if (!searchQuery.trim()) {
+      return true;
+    }
+    const query = searchQuery.toLowerCase();
+    const plainText = container.content.replace(/<[^>]+>/g, ' ');
+    return container.title.toLowerCase().includes(query) || plainText.toLowerCase().includes(query);
+  });
 
   const handleDeleteContainer = useCallback((id: string) => {
     setContainers((prev) => {
@@ -127,8 +182,17 @@ function App() {
       >
         <span>OneNote Evolution - Canvas Prototype</span>
         <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
+          <input
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.target.value)}
+            aria-label="Search notes"
+            placeholder="Search notes..."
+          />
           <button onClick={handleQuickCreate} aria-label="Create note">
             New note
+          </button>
+          <button onClick={handleDuplicateSelected} aria-label="Duplicate selected note" disabled={!selectedContainerId}>
+            Duplicate
           </button>
           <button onClick={handleUndoDelete} aria-label="Undo delete" disabled={deletedStack.length === 0}>
             Undo delete
@@ -136,16 +200,20 @@ function App() {
         </div>
       </header>
       <Canvas onDoubleClick={handleCreateContainer} onCanvasClick={handleCanvasClick}>
-        {containers.map((c) => (
+        {filteredContainers.map((c) => (
           <TextContainer
             key={c.id}
             id={c.id}
             x={c.x}
             y={c.y}
+            title={c.title}
+            content={c.content}
             onPositionChange={handlePositionChange}
             onDelete={handleDeleteContainer}
             onSelect={setSelectedContainerId}
             isSelected={selectedContainerId === c.id}
+            onTitleChange={(id, title) => handleUpdateContainer(id, { title })}
+            onContentChange={(id, content) => handleUpdateContainer(id, { content })}
           />
         ))}
       </Canvas>
@@ -159,7 +227,7 @@ function App() {
           pointerEvents: 'none',
         }}
       >
-        Double-click canvas to create. Delete selected note with Del/Backspace. Undo with Ctrl/Cmd+Z.
+        Double-click canvas to create. Search notes by title/content. Delete selected note with Del/Backspace.
       </footer>
     </div>
   );

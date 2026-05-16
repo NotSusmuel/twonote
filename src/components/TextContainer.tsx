@@ -15,20 +15,28 @@ interface TextContainerProps {
   id: string;
   x: number;
   y: number;
+  title: string;
+  content: string;
   onPositionChange: (id: string, x: number, y: number) => void;
   onDelete: (id: string) => void;
   onSelect: (id: string) => void;
   isSelected: boolean;
+  onTitleChange: (id: string, title: string) => void;
+  onContentChange: (id: string, content: string) => void;
 }
 
 export const TextContainer: React.FC<TextContainerProps> = ({
   id,
   x,
   y,
+  title,
+  content,
   onPositionChange,
   onDelete,
   onSelect,
   isSelected,
+  onTitleChange,
+  onContentChange,
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
@@ -49,7 +57,10 @@ export const TextContainer: React.FC<TextContainerProps> = ({
       }),
       FontFamily,
     ],
-    content: '<p>Click to edit...</p>',
+    content,
+    onUpdate: ({ editor: currentEditor }) => {
+      onContentChange(id, currentEditor.getHTML());
+    },
     onFocus: () => setIsFocused(true),
     onBlur: () => setIsFocused(false),
   });
@@ -121,6 +132,13 @@ export const TextContainer: React.FC<TextContainerProps> = ({
           &times;
         </button>
       </div>
+      <input
+        value={title}
+        onChange={(event) => onTitleChange(id, event.target.value)}
+        aria-label="Note title"
+        className="note-title-input"
+        onPointerDown={(event) => event.stopPropagation()}
+      />
       {isFocused && <Toolbar editor={editor} />}
       <div style={{ padding: 'var(--space-2)' }}>
         <EditorContent editor={editor} />

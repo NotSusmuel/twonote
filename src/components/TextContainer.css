@@ -67,3 +67,17 @@
 .delete-button:active {
   transform: scale(0.9);
 }
+
+.note-title-input {
+  border: none;
+  border-bottom: 1px solid var(--color-border-subtle);
+  padding: var(--space-2);
+  font-size: 13px;
+  font-weight: 600;
+  background-color: transparent;
+  color: var(--color-text-primary);
+}
+
+.note-title-input:focus {
+  outline: 1px solid var(--color-border-focus);
+}

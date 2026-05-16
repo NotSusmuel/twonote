@@ -17,7 +17,9 @@ It currently focuses on fast note placement and rich-text editing on an infinite
 - **New note button** in the header
 - **Selection-aware delete** (Delete / Backspace on selected note)
 - **Undo delete** via button or Ctrl/Cmd + Z
-- Local persistence of note container positions using `localStorage`
+- **Duplicate selected note** action
+- **Search notes** by title or content
+- Local persistence of note containers (position, title, and content) using `localStorage`
 
 ## Tech Stack
 

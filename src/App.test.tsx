@@ -60,4 +60,28 @@ describe('App Canvas', () => {
     fireEvent.click(screen.getByRole('button', { name: /undo delete/i }));
     expect(screen.getAllByText(/Click to edit.../i).length).toBe(initialContainers);
   });
+
+  test('duplicates the selected note from header button', () => {
+    render(<App />);
+    const initialNotes = screen.getAllByLabelText(/note title/i).length;
+    const firstContainer = document.querySelector('.text-container');
+    if (!firstContainer) throw new Error('Container not found');
+
+    fireEvent.pointerDown(firstContainer);
+    fireEvent.click(screen.getByRole('button', { name: /duplicate selected note/i }));
+
+    expect(screen.getAllByLabelText(/note title/i).length).toBe(initialNotes + 1);
+  });
+
+  test('filters notes with search input', () => {
+    render(<App />);
+    const titles = screen.getAllByLabelText(/note title/i);
+
+    fireEvent.change(titles[0], { target: { value: 'Meeting Notes' } });
+    fireEvent.change(titles[1], { target: { value: 'Shopping' } });
+    fireEvent.change(screen.getByRole('textbox', { name: /search notes/i }), { target: { value: 'meeting' } });
+
+    expect(screen.getAllByLabelText(/note title/i)).toHaveLength(1);
+    expect(screen.getByDisplayValue('Meeting Notes')).toBeDefined();
+  });
 });
