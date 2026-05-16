@@ -15,20 +15,28 @@ interface TextContainerProps {
   id: string;
   x: number;
   y: number;
+  title: string;
   content: string;
   onPositionChange: (id: string, x: number, y: number) => void;
   onContentChange: (id: string, content: string) => void;
   onDelete: (id: string) => void;
+  onSelect: (id: string) => void;
+  isSelected: boolean;
+  onTitleChange: (id: string, title: string) => void;
 }
 
 export const TextContainer: React.FC<TextContainerProps> = ({
   id,
   x,
   y,
+  title,
   content,
   onPositionChange,
   onContentChange,
   onDelete,
+  onSelect,
+  isSelected,
+  onTitleChange,
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
@@ -60,6 +68,7 @@ export const TextContainer: React.FC<TextContainerProps> = ({
    * This allows us to capture the pointer and track movement relative to the drag handle.
    */
   const handlePointerDown = (e: React.PointerEvent) => {
+    onSelect(id);
     // Only drag from the handle
     if ((e.target as HTMLElement).classList.contains('drag-handle')) {
       setIsDragging(true);
@@ -101,7 +110,7 @@ export const TextContainer: React.FC<TextContainerProps> = ({
 
   return (
     <div
-      className={`text-container ${isFocused ? 'focused' : ''} ${isDragging ? 'dragging' : ''}`}
+      className={`text-container ${isFocused ? 'focused' : ''} ${isDragging ? 'dragging' : ''} ${isSelected ? 'selected' : ''}`}
       style={{
         left: x,
         top: y,
@@ -121,6 +130,13 @@ export const TextContainer: React.FC<TextContainerProps> = ({
           &times;
         </button>
       </div>
+      <input
+        value={title}
+        onChange={(event) => onTitleChange(id, event.target.value)}
+        aria-label="Note title"
+        className="note-title-input"
+        onPointerDown={(event) => event.stopPropagation()}
+      />
       {isFocused && <Toolbar editor={editor} />}
       <div style={{ padding: 'var(--space-2)' }}>
         <EditorContent editor={editor} />

@@ -2,7 +2,6 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { TextContainer } from '../components/TextContainer';
 
-// Mock useEditor since we don't want to test TipTap internals here
 vi.mock('@tiptap/react', async (importOriginal) => {
   const actual = await importOriginal() as Record<string, unknown>;
   return {
@@ -22,10 +21,14 @@ describe('TextContainer', () => {
     id: '1',
     x: 100,
     y: 100,
+    title: 'My Note',
     content: '<p>Click to edit...</p>',
     onPositionChange: vi.fn(),
     onContentChange: vi.fn(),
     onDelete: vi.fn(),
+    onSelect: vi.fn(),
+    isSelected: false,
+    onTitleChange: vi.fn(),
   };
 
   it('renders correctly at the given position', () => {
@@ -40,5 +43,12 @@ describe('TextContainer', () => {
     const deleteButton = screen.getByRole('button');
     fireEvent.click(deleteButton);
     expect(mockProps.onDelete).toHaveBeenCalledWith('1');
+  });
+
+  it('calls onTitleChange when note title changes', () => {
+    render(<TextContainer {...mockProps} />);
+    const titleInput = screen.getByRole('textbox', { name: /note title/i });
+    fireEvent.change(titleInput, { target: { value: 'Renamed Note' } });
+    expect(mockProps.onTitleChange).toHaveBeenCalledWith('1', 'Renamed Note');
   });
 });

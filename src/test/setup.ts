@@ -1,16 +1,23 @@
 import '@testing-library/jest-dom';
 
 class ResizeObserverMock implements ResizeObserver {
-  observe() {}
+  observe(): void {}
 
-  unobserve() {}
+  unobserve(): void {}
 
-  disconnect() {}
+  disconnect(): void {}
 }
 
-window.ResizeObserver = ResizeObserverMock;
+Object.defineProperty(window, 'ResizeObserver', {
+  writable: true,
+  value: ResizeObserverMock,
+});
 
-// Mock localStorage
+Object.defineProperty(globalThis, 'ResizeObserver', {
+  writable: true,
+  value: ResizeObserverMock,
+});
+
 const localStorageMock: Storage = (function () {
   let store: Record<string, string> = {};
   return {
@@ -36,5 +43,9 @@ const localStorageMock: Storage = (function () {
 })();
 
 Object.defineProperty(window, 'localStorage', {
+  value: localStorageMock,
+});
+
+Object.defineProperty(globalThis, 'localStorage', {
   value: localStorageMock,
 });
