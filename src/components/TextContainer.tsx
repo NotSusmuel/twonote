@@ -13,7 +13,13 @@ interface TextContainerProps {
   onDelete: (id: string) => void;
 }
 
-export const TextContainer: React.FC<TextContainerProps> = ({ id, x, y, onPositionChange, onDelete }) => {
+export const TextContainer: React.FC<TextContainerProps> = ({
+  id,
+  x,
+  y,
+  onPositionChange,
+  onDelete,
+}) => {
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [isFocused, setIsFocused] = useState(false);
@@ -39,13 +45,13 @@ export const TextContainer: React.FC<TextContainerProps> = ({ id, x, y, onPositi
     // Only drag from the handle
     if ((e.target as HTMLElement).classList.contains('drag-handle')) {
       setIsDragging(true);
-      
+
       const canvas = (e.currentTarget as HTMLElement).parentElement;
       if (canvas) {
         const rect = canvas.getBoundingClientRect();
         const canvasX = e.clientX - rect.left + canvas.scrollLeft;
         const canvasY = e.clientY - rect.top + canvas.scrollTop;
-        
+
         setDragOffset({
           x: canvasX - x,
           y: canvasY - y,
@@ -62,7 +68,7 @@ export const TextContainer: React.FC<TextContainerProps> = ({ id, x, y, onPositi
         const rect = canvas.getBoundingClientRect();
         const canvasX = e.clientX - rect.left + canvas.scrollLeft;
         const canvasY = e.clientY - rect.top + canvas.scrollTop;
-        
+
         onPositionChange(id, canvasX - dragOffset.x, canvasY - dragOffset.y);
       }
     }
@@ -93,7 +99,7 @@ export const TextContainer: React.FC<TextContainerProps> = ({ id, x, y, onPositi
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
     >
-      <div 
+      <div
         className="drag-handle"
         style={{
           height: '20px',
@@ -106,18 +112,18 @@ export const TextContainer: React.FC<TextContainerProps> = ({ id, x, y, onPositi
           padding: '0 5px',
           fontSize: '12px',
           color: '#888',
-          userSelect: 'none'
+          userSelect: 'none',
         }}
       >
         <span>:::</span>
-        <button 
+        <button
           onClick={() => onDelete(id)}
           style={{
             border: 'none',
             background: 'none',
             cursor: 'pointer',
             padding: '0 4px',
-            color: '#ccc'
+            color: '#ccc',
           }}
           onPointerDown={(e) => e.stopPropagation()} // Prevent drag when clicking delete
         >

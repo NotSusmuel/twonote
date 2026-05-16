@@ -11,15 +11,18 @@ export const Toolbar: React.FC<ToolbarProps> = ({ editor }) => {
   }
 
   return (
-    <div className="toolbar" style={{
-      display: 'flex',
-      gap: '5px',
-      padding: '5px',
-      borderBottom: '1px solid #eee',
-      backgroundColor: '#fafafa',
-      marginBottom: '5px',
-      flexWrap: 'wrap'
-    }}>
+    <div
+      className="toolbar"
+      style={{
+        display: 'flex',
+        gap: '5px',
+        padding: '5px',
+        borderBottom: '1px solid #eee',
+        backgroundColor: '#fafafa',
+        marginBottom: '5px',
+        flexWrap: 'wrap',
+      }}
+    >
       <button
         onClick={() => editor.chain().focus().toggleBold().run()}
         disabled={!editor.can().chain().focus().toggleBold().run()}

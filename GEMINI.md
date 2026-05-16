@@ -16,4 +16,5 @@ You must strictly adhere to the "Autocommit" workflow:
    - Use the GitHub CLI to create the repository via `gh repo create`. Use appropriate flags (e.g., `--public --source=. --remote=origin --push`) to ensure it runs completely headless and non-interactively.
 
 ---
-*Last updated: 2026-05-16 by FrontendDev*
+
+_Last updated: 2026-05-16 by FrontendDev_

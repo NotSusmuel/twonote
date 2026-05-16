@@ -13,7 +13,7 @@ describe('App Canvas', () => {
   test('adds a new container on double click', () => {
     render(<App />);
     const initialContainers = screen.getAllByText(/Click to edit.../i).length;
-    
+
     // Find the canvas - it's the one with the background grid style
     // We'll just find it by role if possible, or use a container
     const canvas = document.querySelector('div[style*="radial-gradient"]');
@@ -21,7 +21,7 @@ describe('App Canvas', () => {
 
     fireEvent.doubleClick(canvas, {
       clientX: 500,
-      clientY: 500
+      clientY: 500,
     });
 
     const finalContainers = screen.getAllByText(/Click to edit.../i).length;
@@ -32,9 +32,9 @@ describe('App Canvas', () => {
     render(<App />);
     const editor = document.querySelector('.tiptap');
     if (!editor) throw new Error('Editor not found');
-    
+
     fireEvent.focus(editor);
-    
+
     // Check for toolbar buttons - use findBy to allow for state update
     expect(await screen.findByText('B')).toBeDefined();
     expect(await screen.findByText('Task')).toBeDefined();

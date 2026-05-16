@@ -28,12 +28,12 @@ export const Canvas: React.FC<CanvasProps> = ({ children, onDoubleClick, onCanva
   };
 
   return (
-    <div 
-      style={{ 
-        width: '100vw', 
+    <div
+      style={{
+        width: '100vw',
         height: 'calc(100vh - 40px)', // Account for header height
-        position: 'relative', 
-        overflow: 'auto', 
+        position: 'relative',
+        overflow: 'auto',
         backgroundColor: '#fbfbfb',
         backgroundImage: 'radial-gradient(#e5e5e5 1px, transparent 1px)',
         backgroundSize: '20px 20px', // OneNote-style grid
@@ -43,7 +43,16 @@ export const Canvas: React.FC<CanvasProps> = ({ children, onDoubleClick, onCanva
       onClick={handleClick}
     >
       {/* Container to ensure background grid expands with content */}
-      <div style={{ position: 'absolute', top: 0, left: 0, minWidth: '100%', minHeight: '100%', pointerEvents: 'none' }} />
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          minWidth: '100%',
+          minHeight: '100%',
+          pointerEvents: 'none',
+        }}
+      />
       {children}
     </div>
   );
