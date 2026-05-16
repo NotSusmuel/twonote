@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Canvas } from './components/Canvas';
 import { TextContainer } from './components/TextContainer';
+import './styles/variables.css';
 import './App.css';
 
 interface ContainerData {
@@ -52,14 +53,14 @@ function App() {
       <header
         style={{
           height: '40px',
-          backgroundColor: '#7719aa', // OneNote Purple
-          color: 'white',
+          backgroundColor: 'var(--color-bg-header)',
+          color: 'var(--color-text-on-primary)',
           display: 'flex',
           alignItems: 'center',
-          padding: '0 20px',
+          padding: '0 var(--space-4)',
           fontWeight: 'bold',
           fontSize: '14px',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+          boxShadow: 'var(--shadow-md)',
           zIndex: 1000,
           position: 'relative',
         }}
@@ -81,10 +82,10 @@ function App() {
       <footer
         style={{
           position: 'fixed',
-          bottom: '10px',
-          right: '10px',
+          bottom: 'var(--space-2)',
+          right: 'var(--space-2)',
           fontSize: '10px',
-          color: '#888',
+          color: 'var(--color-text-secondary)',
           pointerEvents: 'none',
         }}
       >

@@ -30,8 +30,40 @@ To ensure the "smoothness" and reliability directed by the board, all technical 
    - All tests must pass (`npm run test`).
 3. **Performance Baseline**:
    - UI responsiveness must be prioritized. Any change that introduces noticeable lag (>100ms for interaction response) must be justified and optimized.
-   - For complex canvas operations, aim for 60fps (16.6ms frame budget).
+   - For complex canvas operations (dragging, zooming), aim for 60fps (16.6ms frame budget).
 
 ---
 
-_Last updated: 2026-05-16 by CTO_
+## UX Smoothness & Design Standards
+
+**Status: Active** - Owned by UXDesigner.
+
+To fulfill the board's mandate for a "smooth" experience, all UI/UX work must adhere to these standards:
+
+1. **Interaction & Feedback (Doherty Threshold)**:
+   - Provide immediate visual feedback for all user interactions (hover, active, focus states).
+   - Interaction response time must be <100ms.
+   - Use optimistic UI patterns for data-driven actions.
+
+2. **Visual Continuity & Motion**:
+   - Use purposeful, subtle animations for state transitions (e.g., focus ring fades, modal entries).
+   - Drag-and-drop operations must maintain 60fps and feel "attached" to the pointer.
+   - Avoid abrupt layout shifts (CLSs).
+
+3. **Forgiveness & Safety**:
+   - All destructive actions (delete, clear) must be undoable or require explicit confirmation.
+   - Implement a global Undo/Redo system for canvas and editor actions.
+
+4. **Accessibility (WCAG 2.1 AA)**:
+   - Maintain a minimum color contrast ratio of 4.5:1 for normal text.
+   - Ensure full keyboard navigability (focus management, logical tab order).
+   - Use semantic HTML and ARIA roles.
+
+5. **Aesthetic Integrity**:
+   - Use the design system's tokens (colors, spacing, typography) - no one-offs.
+   - Whitespace is a first-class citizen; avoid cramped layouts.
+   - Polish edge cases: empty states, loading skeletons, and error boundaries.
+
+---
+
+_Last updated: 2026-05-16 by UXDesigner_

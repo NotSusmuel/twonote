@@ -34,8 +34,8 @@ export const Canvas: React.FC<CanvasProps> = ({ children, onDoubleClick, onCanva
         height: 'calc(100vh - 40px)', // Account for header height
         position: 'relative',
         overflow: 'auto',
-        backgroundColor: '#fbfbfb',
-        backgroundImage: 'radial-gradient(#e5e5e5 1px, transparent 1px)',
+        backgroundColor: 'var(--color-bg-canvas)',
+        backgroundImage: 'radial-gradient(var(--color-border) 1px, transparent 1px)',
         backgroundSize: '20px 20px', // OneNote-style grid
         backgroundAttachment: 'local', // Ensure grid scrolls with content
       }}

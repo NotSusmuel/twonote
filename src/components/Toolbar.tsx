@@ -1,5 +1,6 @@
 import React from 'react';
 import { Editor } from '@tiptap/react';
+import './Toolbar.css';
 
 interface ToolbarProps {
   editor: Editor | null;
@@ -11,54 +12,49 @@ export const Toolbar: React.FC<ToolbarProps> = ({ editor }) => {
   }
 
   return (
-    <div
-      className="toolbar"
-      style={{
-        display: 'flex',
-        gap: '5px',
-        padding: '5px',
-        borderBottom: '1px solid #eee',
-        backgroundColor: '#fafafa',
-        marginBottom: '5px',
-        flexWrap: 'wrap',
-      }}
-    >
+    <div className="toolbar">
       <button
+        className={`toolbar-button ${editor.isActive('bold') ? 'active' : ''}`}
         onClick={() => editor.chain().focus().toggleBold().run()}
         disabled={!editor.can().chain().focus().toggleBold().run()}
-        style={{ fontWeight: editor.isActive('bold') ? 'bold' : 'normal' }}
+        aria-label="Toggle Bold"
       >
         B
       </button>
       <button
+        className={`toolbar-button ${editor.isActive('italic') ? 'active' : ''}`}
         onClick={() => editor.chain().focus().toggleItalic().run()}
         disabled={!editor.can().chain().focus().toggleItalic().run()}
-        style={{ fontStyle: editor.isActive('italic') ? 'italic' : 'normal' }}
+        aria-label="Toggle Italic"
       >
         I
       </button>
       <button
+        className={`toolbar-button ${editor.isActive('strike') ? 'active' : ''}`}
         onClick={() => editor.chain().focus().toggleStrike().run()}
         disabled={!editor.can().chain().focus().toggleStrike().run()}
-        style={{ textDecoration: editor.isActive('strike') ? 'line-through' : 'none' }}
+        aria-label="Toggle Strikethrough"
       >
         S
       </button>
       <button
+        className={`toolbar-button ${editor.isActive('heading', { level: 1 }) ? 'active' : ''}`}
         onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-        style={{ fontWeight: editor.isActive('heading', { level: 1 }) ? 'bold' : 'normal' }}
+        aria-label="Toggle Heading 1"
       >
         H1
       </button>
       <button
+        className={`toolbar-button ${editor.isActive('bulletList') ? 'active' : ''}`}
         onClick={() => editor.chain().focus().toggleBulletList().run()}
-        style={{ fontWeight: editor.isActive('bulletList') ? 'bold' : 'normal' }}
+        aria-label="Toggle Bullet List"
       >
         UL
       </button>
       <button
+        className={`toolbar-button ${editor.isActive('taskList') ? 'active' : ''}`}
         onClick={() => editor.chain().focus().toggleTaskList().run()}
-        style={{ fontWeight: editor.isActive('taskList') ? 'bold' : 'normal' }}
+        aria-label="Toggle Task List"
       >
         Task
       </button>

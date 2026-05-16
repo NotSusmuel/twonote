@@ -4,6 +4,7 @@ import StarterKit from '@tiptap/starter-kit';
 import TaskList from '@tiptap/extension-task-list';
 import TaskItem from '@tiptap/extension-task-item';
 import { Toolbar } from './Toolbar';
+import './TextContainer.css';
 
 interface TextContainerProps {
   id: string;
@@ -83,55 +84,28 @@ export const TextContainer: React.FC<TextContainerProps> = ({
 
   return (
     <div
+      className={`text-container ${isFocused ? 'focused' : ''} ${isDragging ? 'dragging' : ''}`}
       style={{
-        position: 'absolute',
         left: x,
         top: y,
-        border: isFocused ? '1px solid #4a90e2' : '1px solid #ccc',
-        backgroundColor: 'white',
-        minWidth: '200px',
-        boxShadow: isFocused ? '0 2px 8px rgba(0,0,0,0.1)' : 'none',
-        zIndex: isFocused || isDragging ? 100 : 1,
-        display: 'flex',
-        flexDirection: 'column',
       }}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
     >
-      <div
-        className="drag-handle"
-        style={{
-          height: '20px',
-          backgroundColor: '#f5f5f5',
-          cursor: 'move',
-          borderBottom: '1px solid #eee',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          padding: '0 5px',
-          fontSize: '12px',
-          color: '#888',
-          userSelect: 'none',
-        }}
-      >
-        <span>:::</span>
+      <div className="drag-handle" aria-label="Drag handle">
+        <span style={{ marginLeft: 'var(--space-1)' }}>:::</span>
         <button
+          className="delete-button"
           onClick={() => onDelete(id)}
-          style={{
-            border: 'none',
-            background: 'none',
-            cursor: 'pointer',
-            padding: '0 4px',
-            color: '#ccc',
-          }}
+          aria-label="Delete container"
           onPointerDown={(e) => e.stopPropagation()} // Prevent drag when clicking delete
         >
           &times;
         </button>
       </div>
       {isFocused && <Toolbar editor={editor} />}
-      <div style={{ padding: '8px' }}>
+      <div style={{ padding: 'var(--space-2)' }}>
         <EditorContent editor={editor} />
       </div>
     </div>
