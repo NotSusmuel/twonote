@@ -3,6 +3,11 @@ import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import TaskList from '@tiptap/extension-task-list';
 import TaskItem from '@tiptap/extension-task-item';
+import { TextStyle } from '@tiptap/extension-text-style';
+import { Color } from '@tiptap/extension-color';
+import { Highlight } from '@tiptap/extension-highlight';
+import { TextAlign } from '@tiptap/extension-text-align';
+import { FontFamily } from '@tiptap/extension-font-family';
 import { Toolbar } from './Toolbar';
 import './TextContainer.css';
 
@@ -32,6 +37,13 @@ export const TextContainer: React.FC<TextContainerProps> = ({
       TaskItem.configure({
         nested: true,
       }),
+      TextStyle,
+      Color,
+      Highlight,
+      TextAlign.configure({
+        types: ['heading', 'paragraph'],
+      }),
+      FontFamily,
     ],
     content: '<p>Click to edit...</p>',
     onFocus: () => setIsFocused(true),
