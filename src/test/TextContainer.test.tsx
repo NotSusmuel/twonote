@@ -22,7 +22,9 @@ describe('TextContainer', () => {
     id: '1',
     x: 100,
     y: 100,
+    content: '<p>Click to edit...</p>',
     onPositionChange: vi.fn(),
+    onContentChange: vi.fn(),
     onDelete: vi.fn(),
   };
 

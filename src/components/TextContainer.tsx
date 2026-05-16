@@ -15,7 +15,9 @@ interface TextContainerProps {
   id: string;
   x: number;
   y: number;
+  content: string;
   onPositionChange: (id: string, x: number, y: number) => void;
+  onContentChange: (id: string, content: string) => void;
   onDelete: (id: string) => void;
 }
 
@@ -23,7 +25,9 @@ export const TextContainer: React.FC<TextContainerProps> = ({
   id,
   x,
   y,
+  content,
   onPositionChange,
+  onContentChange,
   onDelete,
 }) => {
   const [isDragging, setIsDragging] = useState(false);
@@ -45,9 +49,10 @@ export const TextContainer: React.FC<TextContainerProps> = ({
       }),
       FontFamily,
     ],
-    content: '<p>Click to edit...</p>',
+    content,
     onFocus: () => setIsFocused(true),
     onBlur: () => setIsFocused(false),
+    onUpdate: ({ editor: currentEditor }) => onContentChange(id, currentEditor.getHTML()),
   });
 
   /**
