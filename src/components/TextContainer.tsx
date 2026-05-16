@@ -18,11 +18,11 @@ interface TextContainerProps {
   title: string;
   content: string;
   onPositionChange: (id: string, x: number, y: number) => void;
+  onContentChange: (id: string, content: string) => void;
   onDelete: (id: string) => void;
   onSelect: (id: string) => void;
   isSelected: boolean;
   onTitleChange: (id: string, title: string) => void;
-  onContentChange: (id: string, content: string) => void;
 }
 
 export const TextContainer: React.FC<TextContainerProps> = ({
@@ -32,11 +32,11 @@ export const TextContainer: React.FC<TextContainerProps> = ({
   title,
   content,
   onPositionChange,
+  onContentChange,
   onDelete,
   onSelect,
   isSelected,
   onTitleChange,
-  onContentChange,
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
@@ -58,11 +58,9 @@ export const TextContainer: React.FC<TextContainerProps> = ({
       FontFamily,
     ],
     content,
-    onUpdate: ({ editor: currentEditor }) => {
-      onContentChange(id, currentEditor.getHTML());
-    },
     onFocus: () => setIsFocused(true),
     onBlur: () => setIsFocused(false),
+    onUpdate: ({ editor: currentEditor }) => onContentChange(id, currentEditor.getHTML()),
   });
 
   /**
