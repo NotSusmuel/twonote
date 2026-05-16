@@ -24,6 +24,8 @@ describe('TextContainer', () => {
     y: 100,
     onPositionChange: vi.fn(),
     onDelete: vi.fn(),
+    onSelect: vi.fn(),
+    isSelected: false,
   };
 
   it('renders correctly at the given position', () => {

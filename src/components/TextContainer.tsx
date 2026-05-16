@@ -17,6 +17,8 @@ interface TextContainerProps {
   y: number;
   onPositionChange: (id: string, x: number, y: number) => void;
   onDelete: (id: string) => void;
+  onSelect: (id: string) => void;
+  isSelected: boolean;
 }
 
 export const TextContainer: React.FC<TextContainerProps> = ({
@@ -25,6 +27,8 @@ export const TextContainer: React.FC<TextContainerProps> = ({
   y,
   onPositionChange,
   onDelete,
+  onSelect,
+  isSelected,
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
@@ -55,6 +59,7 @@ export const TextContainer: React.FC<TextContainerProps> = ({
    * This allows us to capture the pointer and track movement relative to the drag handle.
    */
   const handlePointerDown = (e: React.PointerEvent) => {
+    onSelect(id);
     // Only drag from the handle
     if ((e.target as HTMLElement).classList.contains('drag-handle')) {
       setIsDragging(true);
@@ -96,7 +101,7 @@ export const TextContainer: React.FC<TextContainerProps> = ({
 
   return (
     <div
-      className={`text-container ${isFocused ? 'focused' : ''} ${isDragging ? 'dragging' : ''}`}
+      className={`text-container ${isFocused ? 'focused' : ''} ${isDragging ? 'dragging' : ''} ${isSelected ? 'selected' : ''}`}
       style={{
         left: x,
         top: y,

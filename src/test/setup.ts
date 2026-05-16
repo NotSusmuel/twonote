@@ -2,13 +2,22 @@ import '@testing-library/jest-dom';
 import { vi } from 'vitest';
 
 // Mock ResizeObserver which is used by TipTap/ProseMirror
-(window as any).ResizeObserver = vi.fn().mockImplementation(() => ({
-  observe: vi.fn(),
-  unobserve: vi.fn(),
-  disconnect: vi.fn(),
-}));
+class ResizeObserverMock implements ResizeObserver {
+  observe = vi.fn();
+  unobserve = vi.fn();
+  disconnect = vi.fn();
+}
 
-// Mock localStorage
+Object.defineProperty(window, 'ResizeObserver', {
+  writable: true,
+  value: ResizeObserverMock,
+});
+
+Object.defineProperty(globalThis, 'ResizeObserver', {
+  writable: true,
+  value: ResizeObserverMock,
+});
+
 const localStorageMock = (function () {
   let store: Record<string, string> = {};
   return {
@@ -28,5 +37,9 @@ const localStorageMock = (function () {
 })();
 
 Object.defineProperty(window, 'localStorage', {
+  value: localStorageMock,
+});
+
+Object.defineProperty(globalThis, 'localStorage', {
   value: localStorageMock,
 });

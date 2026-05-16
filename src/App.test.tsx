@@ -1,8 +1,12 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import { expect, test, describe } from 'vitest';
+import { expect, test, describe, beforeEach } from 'vitest';
 import App from './App';
 
 describe('App Canvas', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
   test('renders initial containers', () => {
     render(<App />);
     // Initial state has 2 containers
@@ -38,5 +42,22 @@ describe('App Canvas', () => {
     // Check for toolbar buttons - use findBy to allow for state update
     expect(await screen.findByText('B')).toBeDefined();
     expect(await screen.findByText('Task')).toBeDefined();
+  });
+
+  test('adds a new container from header button', () => {
+    render(<App />);
+    const initialContainers = screen.getAllByText(/Click to edit.../i).length;
+    fireEvent.click(screen.getByRole('button', { name: /create note/i }));
+    const finalContainers = screen.getAllByText(/Click to edit.../i).length;
+    expect(finalContainers).toBe(initialContainers + 1);
+  });
+
+  test('can undo a delete action from header button', () => {
+    render(<App />);
+    const initialContainers = screen.getAllByText(/Click to edit.../i).length;
+    fireEvent.click(screen.getAllByRole('button', { name: /delete container/i })[0]);
+    expect(screen.getAllByText(/Click to edit.../i).length).toBe(initialContainers - 1);
+    fireEvent.click(screen.getByRole('button', { name: /undo delete/i }));
+    expect(screen.getAllByText(/Click to edit.../i).length).toBe(initialContainers);
   });
 });
