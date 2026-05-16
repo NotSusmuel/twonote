@@ -1,7 +1,7 @@
 [package]
-name = "tauri-app"
+name = "onenote-evolution"
 version = "0.1.0"
-description = "A Tauri App"
+description = "OneNote Evolution"
 authors = ["you"]
 edition = "2021"
 rust-version = "1.85"
@@ -16,10 +16,10 @@ name = "tauri_app_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]
-tauri-build = "~2.0.0"
+tauri-build = { version = "~2.0.0", features = [] }
 
 [dependencies]
-tauri = "~2.0.0"
+tauri = { version = "~2.0.0", features = [] }
 tauri-plugin-opener = "~2.0.0"
 tauri-plugin-sql = { version = "2.0.0", features = ["sqlite"] }
 tauri-plugin-stronghold = "2.0.0"
