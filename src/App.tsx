@@ -149,7 +149,7 @@ const loadNotebooks = (): NotebookData[] => {
 
                 const pages = Array.isArray(candidateSection.pages)
                   ? candidateSection.pages
-                      .map((page, pageIndex) => {
+                      .map((page) => {
                         if (!page || typeof page !== 'object') {
                           return null;
                         }
@@ -248,54 +248,41 @@ function App() {
     })();
   }, []);
 
-  const selectedNotebook = useMemo(
-    () => notebooks.find((notebook) => notebook.id === selectedNotebookId) ?? notebooks[0] ?? null,
-    [notebooks, selectedNotebookId],
-  );
-  const selectedSection = useMemo(
-    () => selectedNotebook?.sections.find((section) => section.id === selectedSectionId) ?? selectedNotebook?.sections[0] ?? null,
-    [selectedNotebook, selectedSectionId],
-  );
-  const selectedPage = useMemo(
-    () => selectedSection?.pages.find((page) => page.id === selectedPageId) ?? selectedSection?.pages[0] ?? null,
-    [selectedSection, selectedPageId],
-  );
-
-  useEffect(() => {
-    if (!selectedNotebookId && notebooks[0]) {
-      setSelectedNotebookId(notebooks[0].id);
+  const selectedNotebook = useMemo(() => {
+    if (notebooks.length === 0) {
+      return null;
     }
+    if (!selectedNotebookId) {
+      return notebooks[0];
+    }
+    return notebooks.find((notebook) => notebook.id === selectedNotebookId) ?? notebooks[0];
   }, [notebooks, selectedNotebookId]);
 
-  useEffect(() => {
-    if (!selectedSectionId && notebooks[0]?.sections[0]) {
-      setSelectedSectionId(notebooks[0].sections[0].id);
-    }
-  }, [notebooks, selectedSectionId]);
+  const selectedSection = useMemo(
+    () => {
+      if (!selectedNotebook || selectedNotebook.sections.length === 0) {
+        return null;
+      }
+      if (!selectedSectionId) {
+        return selectedNotebook.sections[0];
+      }
+      return selectedNotebook.sections.find((section) => section.id === selectedSectionId) ?? selectedNotebook.sections[0];
+    },
+    [selectedNotebook, selectedSectionId],
+  );
 
-  useEffect(() => {
-    if (!selectedPageId && notebooks[0]?.sections[0]?.pages[0]) {
-      setSelectedPageId(notebooks[0].sections[0].pages[0].id);
-    }
-  }, [notebooks, selectedPageId]);
-
-  useEffect(() => {
-    if (!selectedNotebook && notebooks[0]) {
-      setSelectedNotebookId(notebooks[0].id);
-    }
-  }, [notebooks, selectedNotebook]);
-
-  useEffect(() => {
-    if (!selectedSection && selectedNotebook?.sections[0]) {
-      setSelectedSectionId(selectedNotebook.sections[0].id);
-    }
-  }, [selectedNotebook, selectedSection]);
-
-  useEffect(() => {
-    if (!selectedPage && selectedSection?.pages[0]) {
-      setSelectedPageId(selectedSection.pages[0].id);
-    }
-  }, [selectedSection, selectedPage]);
+  const selectedPage = useMemo(
+    () => {
+      if (!selectedSection || selectedSection.pages.length === 0) {
+        return null;
+      }
+      if (!selectedPageId) {
+        return selectedSection.pages[0];
+      }
+      return selectedSection.pages.find((page) => page.id === selectedPageId) ?? selectedSection.pages[0];
+    },
+    [selectedSection, selectedPageId],
+  );
 
   const updateCurrentPage = useCallback(
     (updater: (page: PageData) => PageData) => {
