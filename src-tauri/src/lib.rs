@@ -8,8 +8,7 @@ fn greet(name: &str) -> String {
 }
 
 #[tauri::command]
-async fn trigger_sync() -> Result<(), String> {
-    let worker = sync::SyncWorker::new();
+async fn trigger_sync(worker: State<'_, sync::SyncWorker>) -> Result<(), String> {
     worker.run_sync(vec![]).await.map(|_| ())
 }
 
@@ -24,6 +23,14 @@ async fn sync_notebooks(
 #[tauri::command]
 fn get_sync_status(worker: State<'_, sync::SyncWorker>) -> Result<sync::SyncStatus, String> {
     worker.status()
+}
+
+#[tauri::command]
+async fn connect_onenote_account(
+    worker: State<'_, sync::SyncWorker>,
+    access_token: String,
+) -> Result<sync::SyncPayload, String> {
+    worker.import_from_onenote(access_token).await
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -41,7 +48,8 @@ pub fn run() {
             greet,
             trigger_sync,
             sync_notebooks,
-            get_sync_status
+            get_sync_status,
+            connect_onenote_account
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

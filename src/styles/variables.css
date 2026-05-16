@@ -52,3 +52,30 @@
   --transition-normal: 200ms ease;
   --transition-slow: 300ms ease;
 }
+
+[data-theme='dark'] {
+  --color-primary: #a970ff;
+  --color-primary-light: #bb86fc;
+  --color-primary-dark: #8a3ffc;
+
+  --color-selection: #8ab4f8;
+  --color-selection-subtle: rgba(138, 180, 248, 0.2);
+
+  --color-bg-canvas: #12161d;
+  --color-bg-container: #1a2130;
+  --color-bg-header: #24133f;
+  --color-bg-toolbar: #232b3b;
+  --color-bg-hover: #2d3648;
+
+  --color-border: #3a4458;
+  --color-border-focus: #8ab4f8;
+  --color-border-subtle: #2f3849;
+
+  --color-text-primary: #e9edf7;
+  --color-text-secondary: #b5bfd4;
+  --color-text-on-primary: #ffffff;
+  --color-text-disabled: #6f7b95;
+
+  --color-error: #ff8a80;
+  --color-success: #81c995;
+}

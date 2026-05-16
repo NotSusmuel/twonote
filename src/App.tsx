@@ -15,6 +15,7 @@ interface ContainerData {
 interface PageData {
   id: string;
   title: string;
+  content: string;
   containers: ContainerData[];
 }
 
@@ -36,8 +37,10 @@ interface SyncPayload {
 }
 
 const STORAGE_KEY = 'onenote-evolution-notebooks-data';
+const THEME_KEY = 'onenote-evolution-theme';
 const DEFAULT_NOTE_TITLE = 'Untitled note';
 const DEFAULT_NOTE_CONTENT = '<p>Click to edit...</p>';
+const DEFAULT_PAGE_CONTENT = 'Start writing your page notes here...';
 
 const createDefaultContainers = (): ContainerData[] => [
   { id: '1', x: 100, y: 100, title: 'Quick Notes', content: DEFAULT_NOTE_CONTENT },
@@ -52,12 +55,12 @@ const createDefaultNotebooks = (): NotebookData[] => [
       {
         id: 'section-general',
         name: 'General',
-        pages: [{ id: 'page-welcome', title: 'Welcome', containers: createDefaultContainers() }],
+        pages: [{ id: 'page-welcome', title: 'Welcome', content: DEFAULT_PAGE_CONTENT, containers: createDefaultContainers() }],
       },
       {
         id: 'section-projects',
         name: 'Projects',
-        pages: [{ id: 'page-ideas', title: 'Ideas', containers: [] }],
+        pages: [{ id: 'page-ideas', title: 'Ideas', content: '', containers: [] }],
       },
     ],
   },
@@ -117,6 +120,7 @@ const loadNotebooks = (): NotebookData[] => {
                 {
                   id: 'page-legacy',
                   title: 'Imported Page',
+                  content: '',
                   containers: legacyContainers.length > 0 ? legacyContainers : createDefaultContainers(),
                 },
               ],
@@ -167,6 +171,7 @@ const loadNotebooks = (): NotebookData[] => {
                         return {
                           id: candidatePage.id,
                           title: candidatePage.title,
+                          content: typeof candidatePage.content === 'string' ? candidatePage.content : '',
                           containers,
                         } satisfies PageData;
                       })
@@ -176,7 +181,10 @@ const loadNotebooks = (): NotebookData[] => {
                 return {
                   id: candidateSection.id,
                   name: candidateSection.name,
-                  pages: pages.length > 0 ? pages : [{ id: `page-fallback-${sectionIndex}`, title: 'Untitled Page', containers: [] }],
+                  pages:
+                    pages.length > 0
+                      ? pages
+                      : [{ id: `page-fallback-${sectionIndex}`, title: 'Untitled Page', content: '', containers: [] }],
                 } satisfies SectionData;
               })
               .filter((section): section is SectionData => section !== null)
@@ -188,7 +196,13 @@ const loadNotebooks = (): NotebookData[] => {
           sections:
             sections.length > 0
               ? sections
-              : [{ id: `section-fallback-${notebookIndex}`, name: 'General', pages: [{ id: `page-fallback-${notebookIndex}`, title: 'Untitled Page', containers: [] }] }],
+              : [
+                  {
+                    id: `section-fallback-${notebookIndex}`,
+                    name: 'General',
+                    pages: [{ id: `page-fallback-${notebookIndex}`, title: 'Untitled Page', content: '', containers: [] }],
+                  },
+                ],
         } satisfies NotebookData;
       })
       .filter((notebook): notebook is NotebookData => notebook !== null);
@@ -227,6 +241,7 @@ function App() {
   const [selectedContainerId, setSelectedContainerId] = useState<string | null>(null);
   const [deletedStack, setDeletedStack] = useState<Array<{ pageId: string; container: ContainerData }>>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(() => localStorage.getItem(THEME_KEY) === 'dark');
   const [syncState, setSyncState] = useState<{ isSyncing: boolean; message: string }>({
     isSyncing: false,
     message: 'Sync ready',
@@ -235,6 +250,12 @@ function App() {
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(notebooks));
   }, [notebooks]);
+
+  useEffect(() => {
+    const theme = isDarkMode ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem(THEME_KEY, theme);
+  }, [isDarkMode]);
 
   useEffect(() => {
     void (async () => {
@@ -429,6 +450,7 @@ function App() {
     const newPage: PageData = {
       id: createId('page'),
       title: `Page ${(selectedSection.pages.length || 0) + 1}`,
+      content: '',
       containers: [],
     };
 
@@ -463,6 +485,38 @@ function App() {
       setSyncState({ isSyncing: false, message: 'Sync failed' });
     }
   }, [notebooks]);
+
+  const handleConnectAccount = useCallback(async () => {
+    const token = window.prompt('Paste your Microsoft Graph access token for OneNote:');
+    if (!token || !token.trim()) {
+      return;
+    }
+
+    setSyncState({ isSyncing: true, message: 'Connecting to Microsoft OneNote…' });
+    try {
+      const imported = await invokeTauri<SyncPayload>('connect_onenote_account', { accessToken: token.trim() });
+      if (imported?.notebooks?.length) {
+        setNotebooks(imported.notebooks);
+        setSelectedNotebookId(imported.notebooks[0]?.id ?? null);
+        setSelectedSectionId(imported.notebooks[0]?.sections[0]?.id ?? null);
+        setSelectedPageId(imported.notebooks[0]?.sections[0]?.pages[0]?.id ?? null);
+        setSelectedContainerId(null);
+      }
+      setSyncState({
+        isSyncing: false,
+        message: imported?.synced_at ? `Connected · Last sync: ${imported.synced_at}` : 'Connected (web preview)',
+      });
+    } catch {
+      setSyncState({ isSyncing: false, message: 'Account connection failed' });
+    }
+  }, []);
+
+  const handlePageContentChange = useCallback(
+    (content: string) => {
+      updateCurrentPage((page) => ({ ...page, content }));
+    },
+    [updateCurrentPage],
+  );
 
   const currentContainerCount = selectedPage?.containers.length ?? 0;
 
@@ -540,6 +594,17 @@ function App() {
           <button type="button" className="header-button sync-button" onClick={() => void handleSync()} disabled={syncState.isSyncing}>
             {syncState.isSyncing ? 'Syncing…' : 'Sync OneNote'}
           </button>
+          <button type="button" className="header-button" onClick={() => void handleConnectAccount()} disabled={syncState.isSyncing}>
+            Connect account
+          </button>
+          <button
+            type="button"
+            className="header-button"
+            onClick={() => setIsDarkMode((value) => !value)}
+            aria-label="Toggle dark mode"
+          >
+            {isDarkMode ? 'Light mode' : 'Dark mode'}
+          </button>
         </div>
       </header>
       <div className="sync-status" aria-live="polite">
@@ -599,6 +664,18 @@ function App() {
               ))}
             </aside>
             <div className="canvas-panel">
+              <div className="page-editor-panel">
+                <label className="page-editor-label" htmlFor="page-content-editor">
+                  Page Content
+                </label>
+                <textarea
+                  id="page-content-editor"
+                  className="page-content-editor"
+                  value={selectedPage?.content ?? ''}
+                  onChange={(event) => handlePageContentChange(event.target.value)}
+                  placeholder="Write your OneNote-style page content here..."
+                />
+              </div>
               <Canvas onDoubleClick={handleCreateContainer} onCanvasClick={handleCanvasClick}>
                 {filteredContainers.length === 0 && (
                   <div className="empty-state" role="status">

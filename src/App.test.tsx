@@ -109,4 +109,17 @@ describe('App Canvas', () => {
     fireEvent.click(screen.getByRole('button', { name: /sync onenote/i }));
     expect(await screen.findByText('Sync ready (web preview)')).toBeInTheDocument();
   });
+
+  test('supports OneNote-like page content editing', () => {
+    render(<App />);
+    const pageEditor = screen.getByRole('textbox', { name: /page content/i });
+    fireEvent.change(pageEditor, { target: { value: 'Meeting agenda\n- Decisions\n- Action items' } });
+    expect(pageEditor).toHaveValue('Meeting agenda\n- Decisions\n- Action items');
+  });
+
+  test('toggles dark mode', () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: /toggle dark mode/i }));
+    expect(document.documentElement.getAttribute('data-theme')).toBe('dark');
+  });
 });
